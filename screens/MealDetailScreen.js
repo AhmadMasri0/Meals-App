@@ -3,19 +3,32 @@ import { MEALS } from "../data/dummy-data";
 import { MealDetails } from "../compoents/MealDetails";
 import { SubTitle } from "../compoents/mealDetail/SubTitle";
 import { List } from "../compoents/mealDetail/List";
-import { useLayoutEffect } from "react";
+import { useContext, useLayoutEffect } from "react";
 import { IconButton } from "../compoents/IconButton";
+import { FavoritesContext } from "../store/context/favoritesContext";
 
 export const MealDetailScreen = ({ route, navigation }) => {
 
+    const favoritesContext = useContext(FavoritesContext);
     const id = route.params.id;
     const meal = MEALS.find(m => m.id === id);
 
+    const isMealFavorite = favoritesContext.ids.includes(id);   
+
+    const changeFavoriteStatus = () => {
+
+        if (isMealFavorite) {
+            favoritesContext.removeFavorite(id);
+            return;
+        }
+        favoritesContext.addFavorite(id);
+    }
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerRight: () => <IconButton color={'white'} icon={'star'} onPress={() => console.log('tiktik')} />
+            headerRight: () => <IconButton color={'white'} icon={isMealFavorite ? 'star' : 'star-outline'}
+                onPress={changeFavoriteStatus} />
         });
-    }, [navigation]);
+    }, [navigation, changeFavoriteStatus]);
 
     return <ScrollView>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 50 }}>
